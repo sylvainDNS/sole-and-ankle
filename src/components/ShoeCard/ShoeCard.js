@@ -1,8 +1,9 @@
 import React from 'react';
-import styled from 'styled-components/macro';
+import styled, { css } from 'styled-components/macro';
 
 import { COLORS, WEIGHTS } from '../../constants';
 import { formatPrice, pluralize, isNewShoe } from '../../utils';
+import Flag from '../Flag/Flag';
 import Spacer from '../Spacer';
 
 const ShoeCard = ({
@@ -31,16 +32,26 @@ const ShoeCard = ({
       ? 'new-release'
       : 'default'
 
+  const isOnSale = variant ==='on-sale'
+
   return (
     <Link href={`/shoe/${slug}`}>
       <Wrapper>
         <ImageWrapper>
           <Image alt="" src={imageSrc} />
+          <Flag variant={variant}/>
         </ImageWrapper>
         <Spacer size={12} />
         <Row>
           <Name>{name}</Name>
-          <Price>{formatPrice(price)}</Price>
+          <Price isOnSale={isOnSale}>
+            {formatPrice(price)}
+          </Price>
+          {
+            isOnSale
+              ? <SalePrice>{formatPrice(salePrice)}</SalePrice> 
+              : null
+          }
         </Row>
         <Row>
           <ColorInfo>{pluralize('Color', numOfColors)}</ColorInfo>
@@ -64,11 +75,20 @@ const ImageWrapper = styled.div`
 `;
 
 const Image = styled.img`
+  background-color: #f5f5f5;
+  border-radius: 16px 16px 4px 4px;
+  display: block;
+  padding-bottom: 10%;
   width: 100%;
 `;
 
 const Row = styled.div`
   font-size: 1rem;
+  
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  position: relative;
 `;
 
 const Name = styled.h3`
@@ -76,7 +96,15 @@ const Name = styled.h3`
   color: ${COLORS.gray[900]};
 `;
 
-const Price = styled.span``;
+const Price = styled.span`
+  ${p => p.isOnSale
+    ? css`
+      color: ${COLORS.gray[700]};
+      text-decoration-line: line-through;
+    `
+    : null
+  };
+`;
 
 const ColorInfo = styled.p`
   color: ${COLORS.gray[700]};
@@ -85,6 +113,10 @@ const ColorInfo = styled.p`
 const SalePrice = styled.span`
   font-weight: ${WEIGHTS.medium};
   color: ${COLORS.primary};
+
+  bottom: -100%;
+  right: 0;
+  position: absolute;
 `;
 
 export default ShoeCard;
